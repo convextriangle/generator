@@ -10,6 +10,8 @@ Renderer::~Renderer() {}
 
 void Renderer::OnInit()
 {
+    LoadPipeline();
+    LoadAssets();
 }
 
 void Renderer::OnDestroy()
