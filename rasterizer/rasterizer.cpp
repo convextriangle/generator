@@ -1,5 +1,7 @@
 #include "framework.h"
 #include "rasterizer.h"
+#include "renderer.h"
+#include <optional>
 
 #define MAX_LOADSTRING 100
 
@@ -13,6 +15,8 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+
+std::optional<Renderer> renderer;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -95,12 +99,15 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // Store instance handle in our global variable
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+      CW_USEDEFAULT, 0, 800, 800, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
       return FALSE;
    }
+
+   renderer.emplace(hWnd, uint32_t(800), uint32_t(800));
+   renderer->OnInit();
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
@@ -143,11 +150,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: Add any drawing code that uses hdc here...
+
+            if (renderer.has_value()) {
+                renderer->OnUpdate();
+                renderer->OnRender();
+            }
+
             EndPaint(hWnd, &ps);
         }
         break;
     case WM_DESTROY:
+        renderer = std::nullopt;
         PostQuitMessage(0);
         break;
     default:
