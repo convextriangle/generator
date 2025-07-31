@@ -21,7 +21,8 @@ private:
 	HWND m_windowHandle;
 	const uint32_t m_width;
 	const uint32_t m_height;
-    static const UINT FrameCount = 2;
+    static constexpr UINT FrameCount = 2;
+    static constexpr UINT TexturePixelSize = 4;
 
     struct Vertex
     {
@@ -39,6 +40,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D12CommandQueue> m_commandQueue;
     Microsoft::WRL::ComPtr<ID3D12RootSignature> m_rootSignature;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_rtvHeap;
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_srvHeap;
     Microsoft::WRL::ComPtr<ID3D12PipelineState> m_pipelineState;
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> m_commandList;
     UINT m_rtvDescriptorSize;
@@ -46,6 +48,7 @@ private:
     // App resources.
     Microsoft::WRL::ComPtr<ID3D12Resource> m_vertexBuffer;
     D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;
+    Microsoft::WRL::ComPtr<ID3D12Resource> m_texture;
 
     // Synchronization objects.
     UINT m_frameIndex;
@@ -57,6 +60,7 @@ private:
     void LoadAssets();
     void PopulateCommandList();
     void WaitForPreviousFrame();
+    void UploadTexture(const std::vector<uint8_t>& data);
 };
 
 #endif

@@ -145,6 +145,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="generator.h" />
     <ClInclude Include="rasterizer.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="Resource.h" />
@@ -152,6 +153,7 @@
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="generator.cpp" />
     <ClCompile Include="rasterizer.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="utils.cpp" />

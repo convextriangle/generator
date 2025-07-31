@@ -2,6 +2,7 @@
 #include "rasterizer.h"
 #include "renderer.h"
 #include <optional>
+#include "generator.h"
 
 #define MAX_LOADSTRING 100
 
@@ -17,6 +18,7 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 std::optional<Renderer> renderer;
+BitmapGenerator generator;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -152,7 +154,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             HDC hdc = BeginPaint(hWnd, &ps);
 
             if (renderer.has_value()) {
-                renderer->OnUpdate({});
+                renderer->OnUpdate(generator.GetBitmap(800, 800));
                 renderer->OnRender();
             }
 
