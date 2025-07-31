@@ -56,6 +56,7 @@ ComPtr<ID3DBlob> CompileShader(const std::string &contents, const std::string &e
 
     auto hr = D3DCompile(contents.c_str(), contents.size(), "", nullptr, nullptr, entrypoint.c_str(),
                          targetProfile.c_str(), shaderCompileFlags, 0, &shaderBlob, &errorBlob);
+    std::string error = (const char*)errorBlob->GetBufferPointer();
     ThrowIfFailed(hr);
 
     return shaderBlob;

@@ -30,12 +30,14 @@ SamplerState g_sampler : register(s0);
 
 float4 PSMain(PSInput input) : SV_TARGET
 {
-    uint sampling = g_texture.Sample(g_sampler, input.position.xy);
-    float4 unpackedColor = float4(
+    uint sampling = g_texture.Sample(g_sampler, float2(0.0, 0.0));
+    
+    float4 outputColor = float4(
     ((sampling >> 0) & 0xFF) / 255.0f,
     ((sampling >> 8) & 0xFF) / 255.0f,
     ((sampling >> 16) & 0xFF) / 255.0f,
     ((sampling >> 24) & 0xFF) / 255.0f
-);
-    return unpackedColor;
+    );
+
+    return outputColor;
 }

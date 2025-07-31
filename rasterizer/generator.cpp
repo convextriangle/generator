@@ -8,28 +8,10 @@ std::vector<uint8_t> BitmapGenerator::GetBitmap(int width, int height)
     const uint32_t textureSize = rowPitch * height;
 
     std::vector<uint8_t> data(textureSize);
-    uint8_t* pData = &data[0];
-
-    for (uint32_t n = 0; n < textureSize; n += TexturePixelSize)
-    {
-        uint32_t x = n % rowPitch;
-        uint32_t y = n / rowPitch;
-        uint32_t i = x / cellPitch;
-        uint32_t j = y / cellHeight;
-
-        if (i % 2 == j % 2)
-        {
-            pData[n] = 0x00;        // R
-            pData[n + 1] = 0x00;    // G
-            pData[n + 2] = 0x00;    // B
-            pData[n + 3] = 0xff;    // A
-        }
-        else
-        {
-            pData[n] = 0xff;        // R
-            pData[n + 1] = 0xff;    // G
-            pData[n + 2] = 0xff;    // B
-            pData[n + 3] = 0xff;    // A
+    
+    for (int row = 0; row < height; row++) {
+        for (int column = 0; column < width; column++) {
+            data[row * height + column] = 0x0F;
         }
     }
 
