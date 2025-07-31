@@ -152,7 +152,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             HDC hdc = BeginPaint(hWnd, &ps);
 
             if (renderer.has_value()) {
-                renderer->OnUpdate();
+                renderer->OnUpdate({});
                 renderer->OnRender();
             }
 

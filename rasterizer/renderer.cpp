@@ -43,8 +43,10 @@ void Renderer::OnRender()
     WaitForPreviousFrame();
 }
 
-void Renderer::OnUpdate()
+void Renderer::OnUpdate(std::vector<uint8_t>&& bitmapData)
 {
+    // todo: create texture and from the bitmap and then sample it in the shader
+    // bitmapData is uhhh same size as the screen
 }
 
 void Renderer::LoadPipeline()
@@ -166,9 +168,9 @@ void Renderer::LoadAssets()
     {
         Vertex triangleVertices[] =
         {
-            { { 0.0f, 0.25f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
-            { { 0.25f, -0.25f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
-            { { -0.25f, -0.25f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } }
+            { { -1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
+            { { -1.0f, 3.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
+            { { 3.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } }
         };
 
         const UINT vertexBufferSize = sizeof(triangleVertices);

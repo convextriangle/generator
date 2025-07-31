@@ -16,7 +16,7 @@ public:
 	void OnInit();
 	void OnDestroy();
 	void OnRender();
-	void OnUpdate();
+	void OnUpdate(std::vector<uint8_t> &&bitmapData);
 private:
 	HWND m_windowHandle;
 	const uint32_t m_width;
