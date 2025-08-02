@@ -49,13 +49,15 @@ ComPtr<ID3DBlob> CompileShader(const std::string &contents, const std::string &e
     ComPtr<ID3DBlob> errorBlob;
     ComPtr<ID3DBlob> shaderBlob;
 
-    UINT shaderCompileFlags = 0; // D3DCOMPILE_ENABLE_STRICTNESS maybe?
-#if defined(DEBUG) || defined(_DEBUG)
-    shaderCompileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#if defined(_DEBUG)
+    // Enable better shader debugging with the graphics debugging tools.
+    UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#else
+    UINT compileFlags = 0;
 #endif
 
     auto hr = D3DCompile(contents.c_str(), contents.size(), "", nullptr, nullptr, entrypoint.c_str(),
-                         targetProfile.c_str(), shaderCompileFlags, 0, &shaderBlob, &errorBlob);
+                         targetProfile.c_str(), compileFlags, 0, &shaderBlob, &errorBlob);
     std::string error = (const char*)errorBlob->GetBufferPointer();
     ThrowIfFailed(hr);
 

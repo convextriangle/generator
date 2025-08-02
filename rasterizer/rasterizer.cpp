@@ -3,6 +3,7 @@
 #include "renderer.h"
 #include <optional>
 #include "generator.h"
+#include <thread>
 
 #define MAX_LOADSTRING 100
 
@@ -10,6 +11,8 @@
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
+std::atomic_bool running = false;
+std::thread drawThread;
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -86,6 +89,28 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     return RegisterClassExW(&wcex);
 }
 
+void FrameRenderCallback(size_t periodMs = 16) {
+    const auto period = std::chrono::milliseconds(periodMs);
+    using clock = std::chrono::steady_clock;
+    auto nextFrame = clock::now() + period;
+
+    while (running) {
+        auto now = clock::now();
+        if (now < nextFrame) {
+            std::this_thread::sleep_until(nextFrame);
+        }
+        auto before = clock::now();
+        double dt = std::chrono::duration<double>(before - (nextFrame - period)).count();
+
+        size_t ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now).time_since_epoch().count();
+        if (renderer.has_value()) {
+            renderer->OnUpdate(generator.GetBitmap(800, 800, ms));
+            renderer->OnRender();
+        }
+        nextFrame += period;
+    }
+}
+
 //
 //   FUNCTION: InitInstance(HINSTANCE, int)
 //
@@ -98,21 +123,26 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // Store instance handle in our global variable
+    hInst = hInstance; // Store instance handle in our global variable
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, 800, 800, nullptr, nullptr, hInstance, nullptr);
+    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, 0, 800, 800, nullptr, nullptr, hInstance, nullptr);
 
-   if (!hWnd)
-   {
-      return FALSE;
-   }
+    if (!hWnd)
+    {
+        return FALSE;
+    }
 
-   renderer.emplace(hWnd, uint32_t(800), uint32_t(800));
-   renderer->OnInit();
+    renderer.emplace(hWnd, uint32_t(800), uint32_t(800));
+    renderer->OnInit();
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
+    ShowWindow(hWnd, nCmdShow);
+    UpdateWindow(hWnd);
+
+    running = true;
+    drawThread = std::thread([&]() {
+        FrameRenderCallback();
+        });
 
    return TRUE;
 }
@@ -153,20 +183,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
 
-            if (renderer.has_value()) {
-                renderer->OnUpdate(generator.GetBitmap(800, 800));
-                renderer->OnRender();
-            }
-
             EndPaint(hWnd, &ps);
         }
         break;
     case WM_DESTROY:
+        running = false;
+        if (drawThread.joinable()) { 
+            drawThread.join(); 
+        }
         renderer = std::nullopt;
         PostQuitMessage(0);
         break;
-    default:
+    default: {
         return DefWindowProc(hWnd, message, wParam, lParam);
+    }
     }
     return 0;
 }

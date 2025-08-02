@@ -6,7 +6,8 @@
 class BitmapGenerator
 {
 public:
-	std::vector<uint8_t> GetBitmap(int width, int height);
+	static std::vector<uint8_t> GetDefaultBitmap(int width, int height);
+	std::vector<uint8_t> GetBitmap(int width, int height, size_t ms);
 
 	static constexpr size_t TexturePixelSize = 4;
 };

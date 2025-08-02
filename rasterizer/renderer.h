@@ -3,10 +3,10 @@
 
 #include "framework.h"
 #include <d3d12.h>
-#include <d3dx12.h>
 #include <DirectXMath.h>
 #include <wrl.h>
 #include <dxgi1_6.h>
+#include <d3dx12.h>
 
 class Renderer
 {
@@ -16,7 +16,7 @@ public:
 	void OnInit();
 	void OnDestroy();
 	void OnRender();
-	void OnUpdate(std::vector<uint8_t> &&bitmapData);
+	void OnUpdate(const std::vector<uint8_t> &bitmapData);
 private:
 	HWND m_windowHandle;
 	const uint32_t m_width;
@@ -27,7 +27,7 @@ private:
     struct Vertex
     {
         DirectX::XMFLOAT3 position;
-        DirectX::XMFLOAT4 color;
+        DirectX::XMFLOAT2 uv;
     };
 
     // Pipeline objects.
@@ -43,6 +43,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_srvHeap;
     Microsoft::WRL::ComPtr<ID3D12PipelineState> m_pipelineState;
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> m_commandList;
+    Microsoft::WRL::ComPtr<ID3D12Resource> m_textureUploadHeap;
     UINT m_rtvDescriptorSize;
 
     // App resources.
@@ -58,9 +59,12 @@ private:
 
     void LoadPipeline();
     void LoadAssets();
+    void SetupTexture(const std::vector<uint8_t>& texture);
     void PopulateCommandList();
     void WaitForPreviousFrame();
     void UploadTexture(const std::vector<uint8_t>& data);
+    D3D12_RESOURCE_DESC GetTextureDescription();
+    std::vector<uint8_t> m_texturePixelData;
 };
 
 #endif
